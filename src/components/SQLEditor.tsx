@@ -2,6 +2,7 @@ import { Editor } from '@monaco-editor/react';
 import { Button } from './ui/button';
 import { QueryResult, BaseRow } from '@/types/database';
 import { editor } from 'monaco-editor';
+import { useTheme } from 'next-themes';
 
 interface SQLEditorProps {
   onExecuteQuery: (query: string) => Promise<void>;
@@ -10,6 +11,8 @@ interface SQLEditorProps {
 }
 
 export function SQLEditor({ onExecuteQuery, queryResult, isLoading }: SQLEditorProps) {
+  const { theme } = useTheme();
+
   const handleExecute = async () => {
     const editorValue = window.editor?.getValue();
     if (editorValue) {
@@ -28,7 +31,7 @@ export function SQLEditor({ onExecuteQuery, queryResult, isLoading }: SQLEditorP
           height="100%"
           defaultLanguage="sql"
           defaultValue="-- Write your SQL query here"
-          theme="vs-dark"
+          theme={theme === 'dark' ? 'vs-dark' : 'light'}
           options={{
             minimap: { enabled: false },
             fontSize: 14,
@@ -48,15 +51,15 @@ export function SQLEditor({ onExecuteQuery, queryResult, isLoading }: SQLEditorP
         </Button>
       </div>
 
-      <div className="flex-1 border rounded-lg p-4 overflow-auto min-h-[300px]">
+      <div className="flex-1 border rounded-lg p-4 overflow-auto min-h-[300px] bg-background">
         {queryResult?.error ? (
-          <div className="text-red-500">{queryResult.error}</div>
+          <div className="text-red-500 dark:text-red-400">{queryResult.error}</div>
         ) : queryResult?.rows ? (
           <table className="min-w-full">
             <thead>
               <tr>
                 {queryResult.columns.map((column, i) => (
-                  <th key={i} className="px-4 py-2 text-left border-b">{column}</th>
+                  <th key={i} className="px-4 py-2 text-left border-b border-border">{column}</th>
                 ))}
               </tr>
             </thead>
@@ -64,7 +67,7 @@ export function SQLEditor({ onExecuteQuery, queryResult, isLoading }: SQLEditorP
               {queryResult.rows.map((row: BaseRow, i) => (
                 <tr key={i}>
                   {queryResult.columns.map((column, j) => (
-                    <td key={j} className="px-4 py-2 border-b">
+                    <td key={j} className="px-4 py-2 border-b border-border">
                       {JSON.stringify(row[column])}
                     </td>
                   ))}
@@ -73,7 +76,7 @@ export function SQLEditor({ onExecuteQuery, queryResult, isLoading }: SQLEditorP
             </tbody>
           </table>
         ) : (
-          <div className="text-gray-500">Execute a query to see results</div>
+          <div className="text-muted-foreground">Execute a query to see results</div>
         )}
       </div>
     </div>

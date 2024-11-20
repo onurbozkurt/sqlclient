@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 import { DatabaseConnection } from '@/types/database';
 
 interface ConnectionFormProps {
@@ -30,79 +32,80 @@ export function ConnectionForm({ onConnect }: ConnectionFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-md">
-      <div>
-        <label className="block text-sm font-medium mb-1">Connection Name</label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="name">Connection Name</Label>
+        <Input
+          id="name"
           type="text"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="w-full p-2 border rounded"
           required
         />
       </div>
       
-      <div>
-        <label className="block text-sm font-medium mb-1">Host</label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="host">Host</Label>
+        <Input
+          id="host"
           type="text"
           value={formData.host}
           onChange={(e) => setFormData({ ...formData, host: e.target.value })}
-          className="w-full p-2 border rounded"
           required
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Port</label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="port">Port</Label>
+        <Input
+          id="port"
           type="number"
           value={formData.port}
           onChange={(e) => setFormData({ ...formData, port: parseInt(e.target.value) })}
-          className="w-full p-2 border rounded"
           required
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Database</label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="database">Database</Label>
+        <Input
+          id="database"
           type="text"
           value={formData.database}
           onChange={(e) => setFormData({ ...formData, database: e.target.value })}
-          className="w-full p-2 border rounded"
           required
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Username</label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="username">Username</Label>
+        <Input
+          id="username"
           type="text"
           value={formData.username}
           onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-          className="w-full p-2 border rounded"
           required
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Password (Optional)</label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="password">Password (Optional)</Label>
+        <Input
+          id="password"
           type="password"
           value={formData.password}
           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          className="w-full p-2 border rounded"
         />
       </div>
 
-      <div className="flex items-center">
+      <div className="flex items-center space-x-2">
         <input
+          id="ssl"
           type="checkbox"
           checked={formData.ssl}
           onChange={(e) => setFormData({ ...formData, ssl: e.target.checked })}
-          className="mr-2"
+          className="h-4 w-4 rounded border-input"
         />
-        <label className="text-sm font-medium">Use SSL</label>
+        <Label htmlFor="ssl">Use SSL</Label>
       </div>
 
       <Button type="submit" className="w-full">
