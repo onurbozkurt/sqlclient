@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Client, DatabaseError as PgDatabaseError } from 'pg';
-import { DatabaseConnection } from '@/types/database';
+import { DatabaseConnection, QueryResult } from '@/types/database';
 import { PostgresError } from '@/types/errors';
 
 interface QueryRequest {
@@ -32,11 +32,15 @@ export async function POST(request: Request) {
     
     const result = await client.query(query);
     
-    return NextResponse.json({
+    const queryResult: QueryResult = {
+      command: result.command ?? '',
       columns: result.fields.map(field => field.name),
       rows: result.rows,
-      rowCount: result.rowCount,
-    });
+      rowCount: result.rowCount ?? 0,
+      fields: result.fields,
+    };
+    
+    return NextResponse.json(queryResult);
     
   } catch (error) {
     // Handle PostgreSQL specific errors
@@ -49,13 +53,12 @@ export async function POST(request: Request) {
     }
     
     // Handle connection and other errors
-    const genericError = new PostgresError({
-      message: error instanceof Error ? error.message : 'An unknown error occurred',
-      code: 'CONNECTION_ERROR',
-    });
+    const pgError = new PostgresError(
+      error instanceof Error ? error : { message: 'Unknown error occurred' }
+    );
     
     return NextResponse.json(
-      genericError,
+      pgError,
       { status: 500 }
     );
     
@@ -64,7 +67,9 @@ export async function POST(request: Request) {
       try {
         await client.end();
       } catch (error) {
-        console.error('Error closing database connection:', error);
+        console.error('Error closing database connection:', 
+          error instanceof Error ? error.message : 'Unknown error'
+        );
       }
     }
   }

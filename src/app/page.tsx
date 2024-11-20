@@ -3,12 +3,12 @@
 import { useState } from 'react';
 import { ConnectionForm } from '@/components/ConnectionForm';
 import { SQLEditor } from '@/components/SQLEditor';
-import { DatabaseConnection, QueryResult } from '@/types/database';
+import { DatabaseConnection, QueryResult, BaseRow } from '@/types/database';
 import { PostgresError } from '@/types/errors';
 
 export default function Home() {
   const [connection, setConnection] = useState<DatabaseConnection | null>(null);
-  const [queryResult, setQueryResult] = useState<QueryResult>();
+  const [queryResult, setQueryResult] = useState<QueryResult<BaseRow>>();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleConnect = (newConnection: DatabaseConnection) => {
@@ -37,11 +37,13 @@ export default function Home() {
       }
       setQueryResult(result);
     } catch (error) {
-      const pgError = error instanceof PostgresError ? error : new PostgresError(error);
+      const pgError = error instanceof PostgresError ? error : new PostgresError(error as Error);
       setQueryResult({
+        command: '',
         columns: [],
         rows: [],
         rowCount: 0,
+        fields: [],
         error: `${pgError.type}: ${pgError.message}${pgError.hint ? `\nHint: ${pgError.hint}` : ''}`
       });
     } finally {

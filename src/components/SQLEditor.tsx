@@ -1,6 +1,7 @@
 import { Editor } from '@monaco-editor/react';
 import { Button } from './ui/button';
-import { QueryResult } from '@/types/database';
+import { QueryResult, BaseRow } from '@/types/database';
+import { editor } from 'monaco-editor';
 
 interface SQLEditorProps {
   onExecuteQuery: (query: string) => Promise<void>;
@@ -10,11 +11,14 @@ interface SQLEditorProps {
 
 export function SQLEditor({ onExecuteQuery, queryResult, isLoading }: SQLEditorProps) {
   const handleExecute = async () => {
-    // @ts-expect-error Type window does not have editor
     const editorValue = window.editor?.getValue();
     if (editorValue) {
       await onExecuteQuery(editorValue);
     }
+  };
+
+  const handleEditorMount = (editor: editor.IStandaloneCodeEditor) => {
+    window.editor = editor;
   };
 
   return (
@@ -30,10 +34,7 @@ export function SQLEditor({ onExecuteQuery, queryResult, isLoading }: SQLEditorP
             fontSize: 14,
             wordWrap: 'on',
           }}
-          onMount={(editor) => {
-            // @ts-expect-error Type window does not have editor
-            window.editor = editor;
-          }}
+          onMount={handleEditorMount}
         />
       </div>
       
@@ -60,7 +61,7 @@ export function SQLEditor({ onExecuteQuery, queryResult, isLoading }: SQLEditorP
               </tr>
             </thead>
             <tbody>
-              {queryResult.rows.map((row, i) => (
+              {queryResult.rows.map((row: BaseRow, i) => (
                 <tr key={i}>
                   {queryResult.columns.map((column, j) => (
                     <td key={j} className="px-4 py-2 border-b">
